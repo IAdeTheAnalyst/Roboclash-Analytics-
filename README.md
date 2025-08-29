@@ -39,4 +39,5 @@ This project focuses on analyzing data from multiple sources, including:
 ---
 
 ## 📈 Visual Previews  
-_Add screenshots of your charts, dashboards, or summaries here for better presentation._
+screenshot.png
+
