@@ -39,5 +39,7 @@ This project focuses on analyzing data from multiple sources, including:
 ---
 
 ## 📈 Visual Previews  
-screenshot.png
+![Project Preview](screenshot.png)
+
+
 
