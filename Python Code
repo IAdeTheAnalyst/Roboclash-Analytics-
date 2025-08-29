@@ -1,0 +1,107 @@
+# <span style="color:green">RoboClash Analytics </span>
+
+import pandas as pd
+
+robots_df = pd.read_csv("robots.csv")
+
+fights_df = pd.read_csv("fights.csv")
+
+teams_df = pd.read_csv("teams.csv")
+
+tournament_earnings_df = pd.read_csv("tournament_earnings.csv")
+
+print("robots")
+display(robots_df)
+print("fights")
+display(fights_df)
+print("teams")
+display(teams_df)
+print("tour_earnings")
+display(tournament_earnings_df)
+
+strong_robots = robots_df[robots_df.attack_power > 85][['robot_id','attack_power']]
+
+robots_df.attack_power > 85  
+
+robots_df.dtypes
+
+robots_df.describe()
+
+robots_df.robot_name =  robots_df.robot_name.astype('string')
+
+robots_df.robot_name
+
+fights_df
+
+winners_count = fights_df.groupby("winner_id")
+
+winners_count
+
+winners_count  = fights_df.groupby("winner_id", as_index=False)["fight_id"].count()
+
+# Thhis is a count of the fights the robots have won
+winners_count  = fights_df.groupby("winner_id", as_index=False)["fight_id"].count()
+winners_count.columns = ["robot_id", "fights_won"]
+
+losers_count = fights_df.groupby("loser_id")["fight_id"].count().reset_index()
+losers_count.columns = ["robot_id", "fights_lost"]
+
+display(winners_count)
+display(losers_count)
+
+win_loss_stats = pd.merge(winners_count, losers_count, on="robot_id", how="outer")
+
+win_loss_stats
+
+win_loss_stats.fillna(0)
+
+win_loss_stats.sort_values(by=["fights_won"],ascending=False)
+
+tournament_earnings_df
+
+robot_earnings_df = pd.merge(robots_df, tournament_earnings_df, on="robot_id", how="inner")
+
+robot_earnings_df.dtypes
+
+robot_earnings_df["earnings"] = robot_earnings_df["earnings"].str.replace(r'[$\,]','',regex=True).astype(int)
+
+robot_earnings_df.dtypes
+
+total_robot_earnings_df = robot_earnings_df.groupby("robot_id").agg(
+   total_robot_earnings = ("earnings", "sum"),
+   team_id = ("team_id", "first")
+).reset_index()
+
+total_robot_earnings_df
+
+total_robot_earnings_df["total_team_earnings"] = total_robot_earnings_df.groupby("team_id")["total_robot_earnings"].sum()
+
+total_robot_earnings_df["total_team_earnings"] = \
+    total_robot_earnings_df["total_team_earnings"] = total_robot_earnings_df.groupby("team_id")["total_robot_earnings"].transform("sum")
+total_robot_earnings_df
+
+import matplotlib.pyplot as plt
+
+# create a bar chart
+
+plt.figure(figsize=(10,6))
+bar_width = .35
+
+x = range(len(win_loss_stats))
+
+# plot win and losses side by side 
+
+plt.bar(x, win_loss_stats["fights_won"], width=bar_width, label="Fights Won", color="green")
+plt.bar([i + bar_width for i in x], win_loss_stats["fights_lost"], width=bar_width, label="Fights Lost", color="red")
+
+# set x-tricks and lables 
+
+plt.xlabel("Robot ID")
+plt.ylabel("Number of Fights")
+plt.title("RoboClash Analytics Fights Won and Lost by each robot")
+plt.xticks([i + bar_width / 2 for i in x], win_loss_stats["robot_id"])
+plt.legend()
+plt.tight_layout()
+
+
+
